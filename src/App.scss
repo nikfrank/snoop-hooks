@@ -1,0 +1,265 @@
+.App {
+  text-align: center;
+}
+
+
+.done-container {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+
+  .done-button {
+    background-color: white;
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 24px;
+    border-radius: 5px;
+    user-select: none;
+
+    border: none;
+    box-shadow:
+      0px 1px 3px 0px rgba(0,0,0,0.2),
+      0px 1px 1px 0px rgba(0,0,0,0.14),
+      0px 2px 1px -1px rgba(0,0,0,0.12);
+
+
+    &:focus {
+      outline: none;
+    }
+
+    &:active {
+      box-shadow: none;
+      border: 2px inset lightgray;
+    }
+  }
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .card {
+    width: 300px;
+    min-height: 80px;
+
+    margin: 10px;
+
+    box-shadow:
+      0px 1px 3px 0px rgba(0,0,0,0.2),
+      0px 1px 1px 0px rgba(0,0,0,0.14),
+      0px 2px 1px -1px rgba(0,0,0,0.12);
+
+    .goldRecords {
+      position: absolute;
+      right: 50px;
+      height: 100%;
+      
+      display: flex;
+      flex-direction: row-reverse;
+      align-items: center;
+
+      .goldRecord {
+        width: 20px;
+        z-index: 20;
+      }
+
+      .goldRecord img {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    &.swanky-input-container {
+      position: relative;
+
+      input, select {
+        position: absolute;
+        border: none;
+        border-bottom: 1px solid black;
+        background-color: white;
+        
+        bottom: 2px;
+        left: 2px;
+        width: calc(100% - 16px);
+        height: 60px;
+
+        font-size: 22px;
+        padding-left: 10px;
+
+        transition: font-size 0.25s;
+
+        &:focus {
+            outline: none;
+            font-size: 26px;
+            border-bottom: 2px solid green;
+        }
+
+        option {
+          font-size: 22px;
+        }
+      }
+
+      span.title {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        cursor: pointer;
+        
+        font-weight: 300;
+        font-size: 16px;
+        z-index: 200;
+
+        transition: font-size 0.25s, color 1s;
+      }
+
+      &:focus-within span.title {
+        color: green;
+        font-size: 12px;
+      }
+
+      span.invalid {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+
+        font-size: 12px;
+        color: red;
+        text-align: right;
+      }
+
+      &:focus-within span.invalid {
+        display: none;
+      }
+
+      &:not(:focus-within) span.invalid {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+
+        font-size: 12px;
+        color: red;
+        text-align: right;
+      }
+    }
+
+    .album-dropdown-base {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+
+      padding: 30px 25px 10px 10px;
+      
+      span {
+        margin: 0 4px;
+      }
+      
+      img {
+        height: 45px;
+        margin-top: -5px;
+        width: 45px;
+      }
+
+      .drop-arrow {
+        position: absolute;
+        right: 5px;
+        user-select: none;
+      }
+
+      span:not(.drop-arrow) {
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+
+        &:first-of-type {
+          width: 45px;
+        }
+        &:nth-of-type(2){
+          width: 140px;
+        }
+      }
+
+      & + .click-out {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+
+    ul.selectable-albums {
+      list-style: none;
+      padding: 0;
+
+      position: absolute;
+      top: 100%;
+      width: 100%;
+
+      max-height: 25vh;
+      overflow-y: auto;
+
+      margin: 2px 0 0 0;
+
+      z-index: 30;
+
+      background-color: white;
+      box-shadow:
+        0px 1px 3px 0px rgba(0,0,0,0.2),
+        0px 1px 1px 0px rgba(0,0,0,0.14),
+        0px 2px 1px -1px rgba(0,0,0,0.12);
+
+
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 10px 0 10px 10px;
+        position: relative;
+        z-index: 30;
+        background-color: white;
+
+        &:hover {
+          background-color: #eee;
+        }
+
+        img {
+          height: 45px;
+          margin-top: -5px;
+          width: 45px;
+        }
+
+        span {
+          display: inline-block;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+
+          &:first-of-type {
+            width: 45px;
+          }
+          &:last-of-type{
+            width: 160px;
+          }
+        }
+      }
+
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #0000;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: #7d79;
+        border-radius: 2.5px;
+      }
+
+    }
+  }
+}
