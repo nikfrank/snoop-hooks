@@ -1307,8 +1307,8 @@ and we can limit the size and set text overflow to `ellipsis` (aka to cut off th
           &:first-of-type {
             width: 45px;
           }
-          &:last-of-type{
-            width: 160px;
+          &:nth-last-of-type(2){
+            width: 140px;
           }
         }
 
@@ -1550,7 +1550,6 @@ then it will only go away once we move our mouse off the (newly enlargened) `<ul
             ))}
           </ul>
         </div>
-
 ```
 
 
@@ -1642,38 +1641,34 @@ that `:not(:first-child):not(:last-child)` is pretty ugly...
 
 
 
-
-(( NB - following are left for the author to complete refactoring to hooks ))
-
-
-
-
-
-
-
 #### mobile styling
 
 on mobile devices, `:hover` is mocked by the browser when the user presses the `<ul/>`! It wasn't always that way in the old school.
 
 however, the top list item is sometimes rendering on top of our rapper image, so let's put a `z-index: 25` on the `<img/>` so when the menu is tucked away it goes underneath Snoop (or pac or whomever)
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
 //...
 
-.header img {
-  width: auto;
-  height: 100%;
+.header
+  //...
 
-  z-index: 25;
+  z-index: 50;
+
+  img {
+    //...
+
+    z-index: 25;
+  }
 }
-
 //...
 ```
 
 In the real world (tm), we'll probably be using this pattern to make a navigation menu, not some frivolous `<img/>` selector.
 
 So we'll have to remember it so we can use it in the next workshop!
+
 
 
 ### autocomplete / filter dropdown (country)
@@ -1701,7 +1696,7 @@ Snoop doesn't really care - he just wants his autocomplete to work and his fans 
 
 #### formatting the data
 
-the output from wikidata comes as
+the JSON from the gist comes as
 
 ```js
 [
@@ -1723,13 +1718,18 @@ to print out the data that we'll want for the file, we can do
 JSON.stringify(output.map(i => i.name)).replace(/",/g, '",\n')
 ```
 
-then copy pasted the result (without the containing "double quotes") into my file
+then copy pasted the result (without the containing "double quotes") into my file (also I needed to escape a few single quotes)
 
 how does it work?
 
-first we `.map` out the field from each object that we want (into an array of country names)
+first we `.map` out the field from each object that we want (into an array of country `name`s)
 
-then we `.replace` all the end of item sequence `",`s (using the regex `/",/g` with a g = global flag... ie `.replaceAll`) with `'",\n'` ie a double quote comma and a newline character.
+then we put line breaks in using `.replace`
+
+all the end of item sequence `",`s (using the regex `/",/g` with a g = global flag... ie `.replaceAll`) with `'",\n'` ie a double quote comma and a newline character.
+
+[replace is a very useful String.prototype function, and a great excuse to up your regex skills](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace)
+
 
 now that we did that, we can
 
@@ -1751,13 +1751,13 @@ export default [
 
 <sub>./src/App.js</sub>
 ```js
-  state = {
-    //...
+  //...
 
-    countryQuery: '',
-    selectableCountries: [],
-  }
+  const [country, setCountry] = useState('');
+  const [countryQuery, setCountryQuery] = useState('');
+  const [selectableCountries, setSelectableCountries] = useState([]);
 
+  //...
 ```
 
 ```html
@@ -1765,13 +1765,15 @@ export default [
 
           <div className="card swanky-input-container">
             <div className="country-dropdown-base">
-              <input value={this.state.countryQuery} onChange={this.setCountryQuery}/>
+              <input value={countryQuery} onChange={e=> queryCountries(e.target.value)}/>
+
               <span className='title'>Country</span>
-              {this.state.selectableCountries.length ? (
+
+              {selectableCountries.length ? (
                  <ul className='selectable-countries'>
-                   {this.state.selectableCountries.map(country=> (
-                     <li key={country} onClick={()=> this.selectCountry(country)}>
-                       {country}
+                   {selectableCountries.map(countryName=> (
+                     <li key={countryName} onClick={()=> selectCountry(countryName)}>
+                       {countryName}
                      </li>
                    ))}
                  </ul>
@@ -1782,9 +1784,13 @@ export default [
 ```
 
 
-#### making another dropdown <ul/>
+#### making the country dropdown work
 
-in our setter instance method for `state.countryQuery`, we'll need to set a list of `state.selectableCountries`
+we'll need to write definitions for the functions we already used in our JSX `queryCountries` and `selectCountry`
+
+when we query the countries, we need to calculate the list of countries to show
+
+and when we select one, we need to empty that list
 
 <sub>./src/App.js</sub>
 ```js
@@ -1793,23 +1799,27 @@ import countries from './countries';
 
   //...
 
-  setCountryQuery = event => this.setState({
-    countryQuery: event.target.value,
-    selectableCountries: countries.slice(0,3),
-  })
+  const selectCountry = (countryName)=>{
+    setCountry(countryName);
+    setCountryQuery(countryName);
+    setSelectableCountries([]);
+  };
 
-  selectCountry = country => this.setState({ country, selectableCountries: [], countryQuery: country })
+  const queryCountries = (query)=>{
+    setCountryQuery(query);
+    setSelectableCountries( countries.slice(0, 3) );
+  };
 
   //...
 ```
 
-here when we select a country (the user clicked an option), we want to set `state.country` - the actual value AND `state.countryQuery` - the value the user sees to the result
+when we select a country (the user clicked an option), we want to set `country` - the actual value AND `countryQuery` - the value the user sees to the result
 
-AND we want to se `state.selectableCountries` to empty, so it doesn't get rendered anymore
+for now, typing the the input will always show the first three countries, we'll get that sorted out once we do our styling
 
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
 //...
 
 
@@ -1844,18 +1854,18 @@ ul.selectable-countries {
     0px 1px 1px 0px rgba(0,0,0,0.14),
     0px 2px 1px -1px rgba(0,0,0,0.12);
   
-}
 
-ul.selectable-countries li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  padding: 10px;
-}
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 10px;
 
-ul.selectable-countries li:hover {
-  background-color: #eee;
+    &:hover {
+      background-color: #eee;
+    }
+  }
 }
 
 ```
@@ -1868,13 +1878,13 @@ now we need the autocomplete to do something worthwhile
 
 #### filtering and sorting on the fly
 
-if there's an exact match, we should set that into `state.country`
+if there's an exact match, we should set that into `country`
 
 meanwhile
 
 to generate an autocomplete list
 
-we want to sort by best match (match hard contains case insensitive)
+we want to sort by best match (match string contains case insensitive)
 
 we need to score each country by how close a match it is to our current text
 
@@ -1885,16 +1895,25 @@ then map back to just the name of the country
 then take just the top three
 
 ```js
-  setCountryQuery = event => this.setState({
-    countryQuery: event.target.value,
-    selectableCountries: countries
-      .map(country => [country, score(event.target.value, country)])
-      .sort((ca, cb)=> ca[1] > cb[1] ? -1 : 1)
-      .map(c=> c[0])
-      .slice(0,3),
-    country: countries
-      .find(country => country.toLowerCase() === event.target.value.toLowerCase()) || this.state.country,
-  })
+  //...
+
+  const queryCountries = (query)=>{
+    setCountryQuery(query);
+
+    const foundCountry = countries.find(
+      countryName => countryName.toLowerCase() === query.toLowerCase()
+    );
+
+    if( foundCountry ) selectCountry(foundCountry);
+    else
+      setSelectableCountries(
+        countries
+          .map(countryName => [countryName, score(query, countryName)])
+          .sort((ca, cb)=> cb[1] - ca[1])
+          .map(c=> c[0])
+          .slice(0,3)
+      );
+  };
 
 ```
 
@@ -1917,20 +1936,20 @@ The score will be maximized if the entire query is found and there are no other 
 let's see that in js
 
 ```js
-const score = (query, option)=>
-  [...Array(query.length)].reduce((p, c, i)=>
+const score = (query='', option)=>
+  query.split('').reduce((p, c, i)=>
     p + (option.toLowerCase().includes( query.slice(0, query.length -i).toLowerCase() ) ?
          query.length - i : 0
     ), -Math.min(10, option.length));
 ```
 
-I've skipped the step of `start at 0` and `subtract the length or 10` by starting at `-length, or -10`
+I've accomplished the step of `start at 0` and `subtract the length or 10` by starting at `-length, or -10` (in the `.reduce`'s initial value param)
 
-`[...Array(query.length)]` will give us an Array of the right length which we can `.reduce` over
+`query.split('')` will give us an Array of the right length which we can loop over (one for each character)
 
 `.reduce((p, c, i)=>` is a reduce function (p = previous value, c = current item, i = index)
 
-here, there aren't really current items, so all we care about is p = the running total and i the index we're looking at
+here, the current items are the character which we won't really use, so all we care about is p = the running total and i the index we're looking at
 
 `p + (...)` we return the previous running total plus whatever value we compute for this index
 
@@ -1943,41 +1962,64 @@ here, there aren't really current items, so all we care about is p = the running
 both strings are forced into lower case in order to ignore case differences between the query and the option
 
 
-#### click out
+#### click out, re-query
 
-we need a click out here as well
+we need a click out here
+
+and, if the user clicks back into the input, we want to show the dropdown
 
 
 ```html
-          <div className="card swanky-input-container">
-            <div className="country-dropdown-base">
-              <input value={this.state.countryQuery} onChange={this.setCountryQuery}/>
-              <span className='title'>Country</span>
-              {this.state.selectableCountries.length ? (
-                 <>
-                   <div className='click-out' onClick={this.clickOut}/>
-                   <ul className='selectable-countries'>
-                     {this.state.selectableCountries.map(country=> (
-                       <li key={country} onClick={()=> this.selectCountry(country)}>
-                         {country}
-                       </li>
-                     ))}
-                   </ul>
-                 </>
-              ): null}
-            </div>
+        <div className="card swanky-input-container">
+          <div className="country-dropdown-base">
+            <input
+              value={countryQuery}
+              onChange={e=> queryCountries(e.target.value)}
+              onFocus={()=> queryCountries(countryQuery)}
+            />
+
+            <span className='title'>Country</span>
+
+            {selectableCountries.length ? (
+               <>
+                 <ul className='selectable-countries'>
+                   {selectableCountries.map(countryName=> (
+                     <li key={countryName} onClick={()=> selectCountry(countryName)}>
+                       {countryName}
+                     </li>
+                   ))}
+                 </ul>
+                 <div className='click-out' onClick={()=> setSelectableCountries([])}/>
+               </>
+            ): null}
           </div>
+        </div>
 ```
 
 we can reuse `this.clickOut` from before, we'll need to reset a few more `state` values therein now
 
-```js
-  clickOut = ()=> this.setState({
-    topAlbumOpen: false,
-    selectableCountries: [],
-    countryQuery: this.state.country,
-  })
+<sub>./src/App.scss</sub>
+```scss
+//...
+
+ul.selectable-countries {
+  //...
+
+  & + .click-out {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
 ```
+
+
+(( author NB, updated til here ))
+
+
 
 
 ### picking a date

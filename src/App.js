@@ -6,6 +6,13 @@ import goldRecord from './goldRecord.png';
 
 import snoopAlbums from './snoopAlbums';
 import rappers from './rappers';
+import countries from './countries';
+
+const score = (query='', option)=>
+  query.split('').reduce((p, c, i)=>
+    p + (option.toLowerCase().includes( query.slice(0, query.length -i).toLowerCase() ) ?
+         query.length - i : 0
+    ), -Math.min(10, option.length));
 
 const App = ()=> {
   const [rapName, setRapName] = useState('Killer Mike');
@@ -16,11 +23,15 @@ const App = ()=> {
   const [albumSales, setAlbumSales] = useState(4200000);
 
   const [job, setJob] = useState('');
-  const [country, setCountry] = useState('');
   const [topAlbum, setTopAlbum] = useState(null);
   const [topAlbumOpen, setTopAlbumOpen] = useState(false);  
   
   const [topRapper, setTopRapper] = useState(rappers[0]);
+
+  const [country, setCountry] = useState('');
+  const [countryQuery, setCountryQuery] = useState('');
+  const [selectableCountries, setSelectableCountries] = useState([]);
+  
   const [startDate, setStartDate] = useState(null);
 
   const done = ()=>{
@@ -37,6 +48,31 @@ const App = ()=> {
     setTopAlbum(album);
     setTopAlbumOpen(false);
   };
+
+  const selectCountry = (countryName)=>{
+    setCountry(countryName);
+    setCountryQuery(countryName);
+    setSelectableCountries([]);
+  };
+  
+  const queryCountries = (query)=>{
+    setCountryQuery(query);
+
+    const foundCountry = countries.find(
+      countryName => countryName.toLowerCase() === query.toLowerCase()
+    );
+
+    if( foundCountry ) selectCountry(foundCountry);
+    else
+      setSelectableCountries(
+        countries
+          .map(countryName => [countryName, score(query, countryName)])
+          .sort((ca, cb)=> cb[1] - ca[1])
+          .map(c=> c[0])
+          .slice(0,3)
+      );
+  };
+
   
   return (
     <div className='App'>
@@ -133,6 +169,31 @@ const App = ()=> {
         </div>
 
 
+        <div className="card swanky-input-container">
+          <div className="country-dropdown-base">
+            <input
+              value={countryQuery}
+              onChange={e=> queryCountries(e.target.value)}
+              onFocus={()=> queryCountries(countryQuery)}
+            />
+
+            <span className='title'>Country</span>
+
+            {selectableCountries.length ? (
+               <>
+                 <ul className='selectable-countries'>
+                   {selectableCountries.map(countryName=> (
+                     <li key={countryName} onClick={()=> selectCountry(countryName)}>
+                       {countryName}
+                     </li>
+                   ))}
+                 </ul>
+                 <div className='click-out' onClick={()=> setSelectableCountries([])}/>
+               </>
+            ): null}
+          </div>
+        </div>
+        
         <div className='done-container'>
           <button onClick={done} className='done-button'> Done </button>
         </div>

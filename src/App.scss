@@ -16,9 +16,13 @@
   display: flex;
   justify-content: center;
 
+  z-index: 50;
+  
   img {
     width: auto;
     height: 100%;
+
+    z-index: 25;
   }
 }
 
@@ -237,7 +241,7 @@ ul.hover-dropdown {
         &:first-of-type {
           width: 45px;
         }
-        &:nth-of-type(2){
+        &:nth-last-of-type(2){
           width: 140px;
         }
       }
@@ -322,5 +326,59 @@ ul.hover-dropdown {
       }
 
     }
+  }
+}
+
+
+.country-dropdown-base {
+  position: relative;
+  height: 100%;
+}
+
+.country-dropdown-base input {
+  background-color: #0000;
+}
+
+
+ul.selectable-countries {
+  list-style: none;
+  padding: 0;
+
+  position: absolute;
+  top: 100%;
+  width: 100%;
+
+  max-height: 25vh;
+  overflow-y: auto;
+  
+  margin: 2px 0 0 0;
+
+  z-index: 30;
+
+  background-color: white;
+  box-shadow:
+    0px 1px 3px 0px rgba(0,0,0,0.2),
+    0px 1px 1px 0px rgba(0,0,0,0.14),
+    0px 2px 1px -1px rgba(0,0,0,0.12);
+  
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 10px;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+
+  & + .click-out {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
