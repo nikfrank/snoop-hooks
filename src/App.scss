@@ -3,6 +3,66 @@
 }
 
 
+.header {
+  position: fixed;
+  height: 100px;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 2px solid black;
+  background-color: #3338;
+  color: white;
+
+  display: flex;
+  justify-content: center;
+
+  img {
+    width: auto;
+    height: 100%;
+  }
+}
+
+ul.hover-dropdown {
+  list-style: none;
+  padding: 0;
+  
+  position: absolute;
+  right: 10px;
+  top: 20px;
+
+  height: 30px;
+  overflow: hidden;
+
+  border-radius: 5px;
+  
+  &:hover {
+    height: initial;
+    z-index: 50;
+  }
+
+  li {
+    height: 30px;
+    font-size: 24px;
+    padding: 3px 10px;
+  
+    background-color: #000c;
+
+        cursor: pointer;
+    user-select: none;
+
+    &:first-child {
+      cursor: default;
+      background-color: #0003;
+      text-align: center;
+    }
+
+    &:not(:first-child):not(:last-child) {
+      border-bottom: 1px dashed #8888;
+    }
+  }
+}
+
+
 .done-container {
   flex-basis: 100%;
   display: flex;
@@ -38,7 +98,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-
+  padding-top: 120px;
+  
   .card {
     width: 300px;
     min-height: 80px;

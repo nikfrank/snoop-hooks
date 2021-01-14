@@ -5,6 +5,7 @@ import emailRegex from './emailRegex';
 import goldRecord from './goldRecord.png';
 
 import snoopAlbums from './snoopAlbums';
+import rappers from './rappers';
 
 const App = ()=> {
   const [rapName, setRapName] = useState('Killer Mike');
@@ -19,7 +20,7 @@ const App = ()=> {
   const [topAlbum, setTopAlbum] = useState(null);
   const [topAlbumOpen, setTopAlbumOpen] = useState(false);  
   
-  const [topRapper, setTopRapper] = useState('');
+  const [topRapper, setTopRapper] = useState(rappers[0]);
   const [startDate, setStartDate] = useState(null);
 
   const done = ()=>{
@@ -39,6 +40,16 @@ const App = ()=> {
   
   return (
     <div className='App'>
+      <div className='header'>
+        <img src={topRapper.imgSrc} alt={topRapper.name} />
+        <ul className='hover-dropdown'>
+          <li key='top item'>{topRapper.name}</li>
+          {rappers.map(rapper=>(
+            <li key={rapper.name} onClick={()=> setTopRapper(rapper)}>{rapper.name}</li>
+          ))}
+        </ul>
+      </div>
+      
       <div className='form'>
         <div className='card swanky-input-container'>
           <label>
@@ -73,7 +84,7 @@ const App = ()=> {
           <input value={email} onChange={setValidatedEmail} />
 
           {isEmailValid ? null : (
-            <span className="invalid">Please enter a valid email address</span>
+             <span className="invalid">Please enter a valid email address</span>
           )}
         </div>
 
@@ -93,31 +104,31 @@ const App = ()=> {
           <span className='title'>Top Album</span>
           <div className='album-dropdown-base' onClick={toggleTopAlbumOpen}>
             {!topAlbum ? (
-              <span>Select Top Album</span>
+               <span>Select Top Album</span>
             ):(
-              <>
-                <img src={topAlbum.cover} alt={topAlbum.name}/>
-                <span>{topAlbum.year}</span>
-                <span>{topAlbum.name}</span>
-              </>
+               <>
+                 <img src={topAlbum.cover} alt={topAlbum.name}/>
+                 <span>{topAlbum.year}</span>
+                 <span>{topAlbum.name}</span>
+               </>
             )}
             <span className='drop-arrow'>{topAlbumOpen ? '▲' : '▼'}</span>
           </div>
           
           {!topAlbumOpen ? null : (
-            <>
-              <div className='click-out' onClick={()=> setTopAlbumOpen(false)}/>
+             <>
+               <div className='click-out' onClick={()=> setTopAlbumOpen(false)}/>
 
-              <ul className='selectable-albums'>
-                {snoopAlbums.map(({ name, year, cover })=> (
-                  <li key={name} onClick={()=> selectTopAlbum({ name, year, cover })}>
-                    <img src={cover} alt={name}/>
-                    <span>{year}</span>
-                    <span>{name}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
+               <ul className='selectable-albums'>
+                 {snoopAlbums.map(({ name, year, cover })=> (
+                   <li key={name} onClick={()=> selectTopAlbum({ name, year, cover })}>
+                     <img src={cover} alt={name}/>
+                     <span>{year}</span>
+                     <span>{name}</span>
+                   </li>
+                 ))}
+               </ul>
+             </>
           )}
         </div>
 

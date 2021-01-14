@@ -980,8 +980,6 @@ first let's initialize some varaibles with `useState` for the user to fill in
   const [job, setJob] = useState('');
   const [country, setCountry] = useState('');
   const [topAlbum, setTopAlbum] = useState(null);
-  const [topRapper, setTopRapper] = useState('');
-  const [startDate, setStartDate] = useState(null);
 
 //...
 ```
@@ -1396,22 +1394,6 @@ Let's be proactive and funk it up
 
 ```
 
-
-
-
-
-
-
-
-
-(( NB - following are left for the author to complete refactoring to hooks ))
-
-
-
-
-
-
-
 ### menu hover dropdown -> header
 
 Our app has no bite... just a bunch of form elements. Snoop wants to put a header at the top of the page that lets us set our favourite g-funk rapper to appear
@@ -1429,7 +1411,7 @@ we can use the index-file pattern again to keep our data separate from our view
 ```js
 export default [
   { name: 'Snoop Dogg', imgSrc: 'http://i.imgur.com/8wjnDvw.png' },
-  { name: 'Tupac Shakur', imgSrc: 'https://stickeroid.com/uploads/pic/full-pngimg/thumb/stickeroid_5bf57ed20be69.png' },
+  { name: 'Tupac Shakur', imgSrc: 'https://timpviewnews.org/wp-content/uploads/2019/09/xzz8rezYcE8usc8V33ZAYTNOtWK0vCN5eEIhkCf2.png' },
   { name: 'Dr Dre', imgSrc: 'https://i.imgur.com/QYo0aPI.png' },
   { name: 'Eminem', imgSrc: 'http://4.bp.blogspot.com/_wevkEt-i9rw/R0YBWvL9WuI/AAAAAAAAABs/G6TjBC3BuXY/s320/eminem-5.png' },
 ];
@@ -1449,8 +1431,8 @@ now we get to use the other common value ... `position: fixed` ... which is the 
     //...
 ```
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
 .header {
   position: fixed;
   height: 100px;
@@ -1497,8 +1479,8 @@ we're going to need to import the `rappers` array (along with whatever we were `
 
 <sub>./src/App.js</sub>
 ```js
-import React, { Component } from 'react';
-import './App.css';
+import { useState } from 'react';
+import './App.scss';
 
 import emailRegex from './emailRegex';
 import goldRecord from './goldRecord.png';
@@ -1506,58 +1488,47 @@ import goldRecord from './goldRecord.png';
 import snoopAlbums from './snoopAlbums';
 import rappers from './rappers';
 
-class App extends Component {
+const App = ()=> {
   //...
 ```
 
-now we can set an init value in our init `state`
+now we can make a state variable to track the `topRapper`
 
 ```js
-//...
+  //...
 
-class App extends Component {
-  state = {
-    rapName: 'Nate Dogg z"l',
-    albumSales: 4200000,
-    email: '',
-    isEmailInvalid: false,
-    job: '',
-    country: '',
-    topAlbum: null,
-    topAlbumOpen: false,
-    topRapper: rappers[0],
-    startDate: null,
-  }
+  const [topRapper, setTopRapper] = useState(rappers[0]);
 
   //...
 ```
 
-and render an image from the `state.topRapper.imgSrc`
+and render an image from the `topRapper.imgSrc`
 
 ```html
   <div className='header'>
-    <img src={this.state.topRapper.imgSrc} alt={this.state.topRapper.name} />
+    <img src={topRapper.imgSrc} alt={topRapper.name} />
   </div>
 ```
 
 and style it to not look all stretched out
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
 .header {
   //...
 
   display: flex;
   justify-content: center;
-}
 
-.header img {
-  width: auto;
-  height: 100%;
+  img {
+    width: auto;
+    height: 100%;
+  }
 }
 
 //...
 ```
+
 
 #### hover dropdown selection
 
@@ -1571,21 +1542,15 @@ then it will only go away once we move our mouse off the (newly enlargened) `<ul
 
 ```html
         <div className='header'>
-          <img src={this.state.topRapper.imgSrc} alt={this.state.topRapper.name}/>
+          <img src={topRapper.imgSrc} alt={topRapper.name}/>
           <ul className='hover-dropdown'>
-            <li key='top item'>{this.state.topRapper.name}</li>
+            <li key='top item'>{topRapper.name}</li>
             {rappers.map(rapper=>(
-              <li key={rapper.name} onClick={()=> this.setTopRapper(rapper)}>{rapper.name}</li>
+              <li key={rapper.name} onClick={()=> setTopRapper(rapper)}>{rapper.name}</li>
             ))}
           </ul>
         </div>
 
-```
-
-and the setter instance method [that we've already written the binding for!]
-
-```js
-  setTopRapper = topRapper => this.setState({ topRapper })
 ```
 
 
@@ -1593,8 +1558,8 @@ so far we have the currently selected rapper at the top slot, and then all the o
 
 now the funky CSS
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
 //...
 
 ul.hover-dropdown {
@@ -1607,19 +1572,19 @@ ul.hover-dropdown {
 
   height: 30px;
   overflow: hidden;
-}
 
-ul.hover-dropdown li {
-  height: 30px;
-  font-size: 24px;
-  padding: 3px 10px;
+  &:hover {
+    height: initial;
+    z-index: 50;
+  }
+
+  li {
+    height: 30px;
+    font-size: 24px;
+    padding: 3px 10px;
   
-  background-color: #000c;
-}
-
-ul.hover-dropdown:hover {
-  height: initial;
-  z-index: 50;
+    background-color: #000c;
+  }
 }
 
 //...
@@ -1639,29 +1604,33 @@ the sublime slickness of our hover dropdown bidness is being hampered by it not 
 
 let's round the corners and put in a separator for the list items
 
-<sub>./src/App.css</sub>
-```css
+<sub>./src/App.scss</sub>
+```scss
+//...
+
 ul.hover-dropdown {
   //...
 
   border-radius: 5px;
-}
 
-ul.hover-dropdown li {
   //...
 
-  cursor: pointer;
-  user-select: none;
-}
+  li {
+    //...
 
-ul.hover-dropdown li:first-child {
-  cursor: default;
-  background-color: #0003;
-  text-align: center;
-}
+    cursor: pointer;
+    user-select: none;
 
-ul.hover-dropdown li:not(:first-child):not(:last-child) {
-  border-bottom: 1px dashed #8888;
+    &:first-child {
+      cursor: default;
+      background-color: #0003;
+      text-align: center;
+    }
+
+    &:not(:first-child):not(:last-child) {
+      border-bottom: 1px dashed #8888;
+    }
+  }
 }
 
 //...
@@ -1670,6 +1639,16 @@ ul.hover-dropdown li:not(:first-child):not(:last-child) {
 that `:not(:first-child):not(:last-child)` is pretty ugly...
 
 [if we check our handy list of CSS pseudoselectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes), it would appear there's no better option for selecting the non-endcap items in a list. So be it - cash don't grow on trees, so we need to do tha deed
+
+
+
+
+(( NB - following are left for the author to complete refactoring to hooks ))
+
+
+
+
+
 
 
 #### mobile styling
