@@ -2210,7 +2210,7 @@ if you've coded along this far, you've spent the time learning most of the skill
 
 if you just copy pasted along, you've seen the process of how front end products are developed
 
-in the next section, we'll deploy out website to the cloud and build a backend for our client to read the form submissions
+in the next section, we'll deploy our website to the cloud and build a backend for our client to read the form submissions
 
 this will require access to an AWS account.
 
