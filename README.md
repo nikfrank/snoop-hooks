@@ -57,7 +57,7 @@ import './App.css';
 const App = ()=> {
   const done = ()=>{
     console.log('done');
-  }
+  };
   
   return (
     <div className='App'>
@@ -69,7 +69,7 @@ const App = ()=> {
 export default App;
 ```
 
-`const done = ()=> { console.log('done') }` is defining `done` as a function newly on every render. We're working in a functional paradigm in 2020, so making functions is all we do. We'll see later this is necessary to make sure we use updated variable values.
+`const done = ()=> { console.log('done') }` is defining `done` as a function newly on every render. We've been working in a functional paradigm since 2020, so making functions is all we do. We'll see later this is necessary to make sure we use updated variable values.
 
 what we'll be doing in this workshop is learning to get user values into reactive variables, so let's use a state and log it out in `done`
 
@@ -82,7 +82,7 @@ import { useState } from 'react';
 import './App.css';
 
 const App = ()=> {
-  const [rapName, setRapName] = useState('Killer Mike');
+  const [rapName, setRapName] = useState('Nate Dee Oh Double Gee');
   const [albumSales, setAlbumSales] = useState(4200000);
   
   const done = ()=>{
@@ -113,19 +113,23 @@ each of our `useState` calls is giving us a setter function, which we can call w
 
 and on the right side
 
-`useState('Killer Mike')` - we call the `useState` hook, passing in an initial value
+`useState('Nate Dee Oh Double Gee')` - we call the `useState` hook, passing in an initial value
 
-we're showing some respect to [the big man from ATL](https://en.wikipedia.org/wiki/Killer_Mike) - IF YOU'RE LIVING IN GA, REMEMBER TO VOTE IN THE SENATE RUNOFFS IN JANUARY
-
-everything is exactly the same for our `albumSales` variable and its setter `setAlbumSales`, execpt of course that its initial value is a number (no surprise there Killer Mike is killing it quadruple platinum)
+everything is exactly the same for our `albumSales` variable and its setter `setAlbumSales`, execpt of course that its initial value is a number (no surprise there Nate Dogg is killin it quadruple platinum)
 
 ---
 
 now we can throw some SCSS sauce on there and it'll be good to go
 
-first, let's [enable scss by following these super simple instructions](https://create-react-app.dev/docs/adding-a-sass-stylesheet/)
+first, let's enable SCSS
 
-and renaming <sub>./src/App.css</sub> to <sub>./src/App.scss</sub> (and fixing the `import` statement)
+ctrl-c to kill the dev-server process
+
+`npm i -S sass`
+
+then `npm start` to restart it
+
+now renaming <sub>./src/App.css</sub> to <sub>./src/App.scss</sub> (also the import in App.js) will allow us to use the upgraded SCSS syntax
 
 <sub>./src/App.js</sub>
 
@@ -182,7 +186,7 @@ this is one of the huge advantages of SCSS for keeping our rules well organized
 
 ### editing the rap name
 
-we have a `rapName` listed in our `state`, now it's time to let the user update it
+we have a `rapName` state variable, now it's time to let the user update it
 
 first we'll render an `<input />` element with the value in it
 
@@ -198,7 +202,7 @@ first we'll render an `<input />` element with the value in it
 //...
 ```
 
-so that's great if the value never changes, but Snoop wants the user's input to be set in the `rapName` reactive state variable so it can be rendered back to the user!
+so that's great if the value never changes, but Snoop wants the user's input to be set in the `rapName` variable so it can be rendered back to the user!
 
 we learned already that everything that changes that the user sees has to be reactive (aka "programming in REACT")
 
@@ -214,22 +218,22 @@ This pattern is standard in React and goes by the name: [controlled input patter
 //...
   
     <div className='App'>
-      <input value={rapName} onChange={e=> setRapName(e.target.value)}/>
+      <input value={rapName} onChange={event=> setRapName(event.target.value)} />
       <button onClick={done} className='done-button'> Done </button>
     </div>
 
 //...
 ```
 
-`e => setRapName(e.target.value)` - let's break it down
+`event => setRapName(event.target.value)` - let's break it down
 
-the `e` variable represents a `change` event fired by the `<input/>`, passed to our `=>` function
+the `event` variable represents a `change event` fired by the `<input/>`, passed to our `=>` function
 
 `setRapName` - our setter from `useState` we defined earlier
 
-`e.target` represents the `<input/>` itself, and so `e.target.value` contains the new value the user is trying to set
+`event.target` represents the `<input/>` itself, and so `event.target.value` contains the new value the user is trying to set
 
-together, we're defining a function which takes the event, and calls out setter with the correct next value (which will trigger a render!)
+together, we're defining a function which takes the event, and calls our setter with the correct next value (which will trigger a render!)
 
 
 ### card container for form input
@@ -247,7 +251,7 @@ first we'll wrap our `<input />` with a container (.card) `<div>...</div>` and n
     <div className='App'>
       <div className='form'>
         <div className='card'>
-          <input value={rapName} onChange={e=> setRapName(e.target.value)}/>
+          <input value={rapName} onChange={event=> setRapName(event.target.value)} />
         </div>
         
         <button onClick={done} className='done-button'> Done </button>
@@ -344,9 +348,9 @@ and make it look more like our cards by giving it a `box-shadow` in its default 
 
     border: none;
     box-shadow:
-      0px 1px 3px 0px rgba(0,0,0,0.2),
-      0px 1px 1px 0px rgba(0,0,0,0.14),
-      0px 2px 1px -1px rgba(0,0,0,0.12);
+      0px 1px 3px 0px rgba(0,0,0,0.25),
+      0px 1px 1px 0px rgba(0,0,0,0.1875),
+      0px 2px 1px -1px rgba(0,0,0,0.125);
   
     //...
 ```
@@ -387,14 +391,14 @@ let's add a `<label>...</label>` around it (wrapping with `<label/>` means the u
         <div className='card'>
           <label>
             Rap Name
-            <input value={rapName} onChange={e=> setRapName(e.target.value)}/>
+            <input value={rapName} onChange={event=> setRapName(event.target.value)}/>
           </label>
         </div>
 
 //...
 ```
 
-Snoop wants it [swanky](https://material-ui.com/demos/text-fields/)
+Snoop wants it [swanky like thur](https://material-ui.com/demos/text-fields/)
 
 
 #### position: absolute;
@@ -408,14 +412,14 @@ to accomplish this, we'll need to have a [position: relative](https://www.google
         <div className='card swanky-input-container'>
           <label>
             <span className='title'>Rap Name</span>
-            <input value={rapName} onChange={e=> setRapName(e.target.value)}/>
+            <input value={rapName} onChange={event=> setRapName(event.target.value)}/>
           </label>
         </div>
 
 //...
 ```
 
-we'll see later why the label text moved into a `<span>`
+we'll see later why the label text moved into a `<span>` (spoiler: we need an element wrapping the text to style it effectively)
 
 
 #### flat input
@@ -427,14 +431,6 @@ we'll style the `<input/>` first, then move on to the label text
 //...
 
 
-```
-
-now we can get rid of the border and set the size
-
-<sub>./src/App.css</sub>
-```css
-//...
-
 .form {
   //...
   
@@ -443,6 +439,8 @@ now we can get rid of the border and set the size
 
     &.swanky-input-container {
       position: relative;
+
+      background: white;
 
       input {
         position: absolute;
@@ -494,7 +492,7 @@ now let's add an underline like in the design spec
 
       input {
         //...
-        border-bottom: 1px solid black;
+        border-bottom: 2px solid #0004;
         
   //...
   
@@ -607,7 +605,7 @@ which looks like
 
       &:focus-within span.title {
         color: green;
-        font-size: 12px;
+        font-size: 0.875rem;
       }
 //...
 
@@ -627,7 +625,7 @@ now we can put a transition on both of those styles and everything should be sol
       span.title {
         //...
 
-        transition: font-size 0.25s, color 1s;
+        transition: font-size 0.5s, color 1s;
       }
 
 //...
@@ -651,7 +649,7 @@ so let's make another variable for the user's email (right after our other `useS
 ```
 
 
-and another card right after the first for input
+and another card (inside the `.form` div)
 
 
 ```html
@@ -659,7 +657,7 @@ and another card right after the first for input
 
         <div className='card swanky-input-container'>
           <span className='title'>Email</span>
-          <input value={email} onChange={e=> setEmail(e.target.value)} />
+          <input value={email} onChange={event=> setEmail(event.target.value)} />
         </div>
 
 //...
@@ -681,36 +679,39 @@ let's see what that looks like
 
 <sub>./src/App.js</sub>
 ```js
+import { useState, useMemo } from 'react';
+
 //...
 
-  const [isEmailValid, setIsEmailValid] = useState(false);
-
-  const setValidatedEmail = e => {
-    setEmail( e.target.value );
-    setIsEmailValid( e.target.value.includes('@gmail.com') );
-  };
+  const isEmailValid = useMemo(()=> (email.includes('@gmail.com')), [email]);
 
   //...
 ```
-```html
-          <input value={email} onChange={setValidatedEmail} />
-```
 
+we're computing a memo with `useMemo` - which has two params
 
-we've now just added one more variable
+first, a function to compute the value
 
-it starts out as `false` (if the user hasn't entered anything, the email van't be invalid yet)
+second, an array of trigger variables, which will cause the function to be computed each time they change
 
-then as soon as the user types, we check whether each new value contains the string `@gmail.com` to determine if it is a valid email
+so as soon as the user types, the `email` variable will change
+
+the memo will be recomputed
+
+if the new value for the variable contains `@gmail.com` we say it is a valid email
+
+and that boolean outcome value is stored in the `isEmailValid` variable
+
+(and yes, you can use one memo's output to trigger another!)
 
 if you use hotmail still, it just won't work!
 
-our `onChange` handler for our `email` input now sets two variables!
+our `onChange` handler for our `email` input now (effectively) sets two variables!
 
 
 #### rendering from validation state
 
-if the email is inValid, we want to render out an extra `<span>` with our validation message
+if the email is invalid, we want to render out an extra `<span>` with our validation message
 
 
 ```html
@@ -718,10 +719,10 @@ if the email is inValid, we want to render out an extra `<span>` with our valida
 
         <div className='card swanky-input-container'>
           <span className='title'>Email</span>
-          <input value={email} onChange={setValidatedEmail} />
+          <input value={email} onChange={event=> setEmail(event.target.value)} />
           
           {isEmailValid ? null : (
-            <span className="invalid">Please enter a valid email address</span>
+            <span className='invalid'>Please enter a valid email address</span>
           )}
         </div>
 
@@ -735,7 +736,7 @@ so far so good, now we can style it to fit in the top right corner of our card
 ```scss
 //... inside the .swanky-input-container 
 
-     span.invalid {
+      span.invalid {
         position: absolute;
         top: 5px;
         right: 5px;
@@ -782,7 +783,7 @@ Our "gmail only" rule is a bit harsh! Snoop wants us to use the RFC 5322 Officia
 
 To accomplish this goal, we'll need to learn how to [check a string with a regex in javascript](https://www.google.com/search?q=check+string+regex+js)
 
-now that we've done that, let's plop that regex down into a utility file, export it, import it to App.js and use it for our check
+now that we've done that, let's plop that regex down into a well named file, export it, import it to App.js and use it for our check
 
 
 `$ touch ./src/emailRegex.js`
@@ -802,13 +803,8 @@ which will of course make our default email address `snoop@dogg.pound` valid
 import emailRegex from './emailRegex';
 
   //...
-  const [isEmailValid, setIsEmailValid] = useState(true);
   
-  const setValidatedEmail = e => {
-    setEmail( e.target.value );
-    setIsEmailValid( emailRegex.test( e.target.value ) );
-  };
-
+  const isEmailValid = useMemo(()=> emailRegex.test(email), [email]);
   
   //...
 
@@ -834,7 +830,7 @@ like before, we'll need to connect our setter to our input, along with the divs 
             <input value={albumSales}
                    type='number'
                    step={1000}
-                   onChange={e=> setAlbumSales(Number(e.target.value))} />
+                   onChange={event=> setAlbumSales(+event.target.value)} />
           </label>
         </div>
 
@@ -842,7 +838,7 @@ like before, we'll need to connect our setter to our input, along with the divs 
 
 here, I've set `type='number'` and `step={1000}` to take advantage of the built in HTML number input behaviour.
 
-also our `onChange` handler will cast the `e.target.value` to `Number`, because `<input/>`s always send us strings
+also our `onChange` handler will cast the `event.target.value` to `Number` using `+`, because `<input/>`s always send us strings
 
 
 ### gold and platinum albums
@@ -870,7 +866,7 @@ import goldRecord from './goldRecord.png';
             <input value={albumSales}
                    type='number'
                    step={1000}
-                   onChange={e=> setAlbumSales(Number(e.target.value))} />
+                   onChange={event=> setAlbumSales(Number(event.target.value))} />
           </label>
           <div className='goldRecords'>
             {
@@ -885,7 +881,7 @@ import goldRecord from './goldRecord.png';
         </div>
 ```
 
-we'll use the outer `<div>` as a flex container (going right to left) starting from 50px from the right side of the swanky-input-container
+we'll use the outer `<div>` as a flex container (going right to left) starting from 50px from the right side of the `.swanky-input-container`
 
 let's put these styles nested inside `.card`, as that is the div it'll be positioned relative to
 
@@ -954,7 +950,7 @@ solid!
 
 We're using a common pattern in React here of computing multiple things from one reactive variable
 
-if the computation is more complex (sorting, arithmetic, etc), we would consider not doing it inside the render function, as that would slow down our app, like we did with the email validation.
+if the computation is more complex (sorting, arithmetic, etc), we would consider not doing it inside the render function, as that would slow down our app, like we did with the email validation with `useMemo`.
 
 ---
 
@@ -991,7 +987,7 @@ first let's initialize some varaibles with `useState` for the user to fill in
 ```html
           <div className="card swanky-input-container">
             <label>
-              <select onChange={e=> setJob(e.target.value)} value={job}>
+              <select onChange={event=> setJob(event.target.value)} value={job}>
                 <option value=''>Select Job</option>
                 <option value='rapper'>rapper</option>
                 <option value='sales'>sales</option>
@@ -1008,11 +1004,11 @@ here we'll also want to add selectors for the select, and to fix the `font-size`
 <sub>./src/App.scss</sub>
 ```scss
 //... .swanky-input-container
+
+//... we just need to add ', select' to the selector on the existing rule
       
       input, select {
         //... our other input styles
-
-        background-color: white;
 
         option {
           font-size: 22px;
@@ -1057,6 +1053,7 @@ let's make an index file for all the albums to keep things organized
 ```js
 export default [
   { name: 'Doggystyle', year: 1993, cover: 'https://upload.wikimedia.org/wikipedia/en/6/63/SnoopDoggyDoggDoggystyle.jpg' },
+  //...
 ];
 ```
 
@@ -1112,7 +1109,9 @@ again, we can nest these rules inside `.card`
       cursor: pointer;
 
       padding: 30px 25px 10px 10px;
-      max-width: 300px;
+      width: 300px;
+
+      height: calc(100% - 40px);
       
       img {
         height: 45px;
@@ -1138,6 +1137,8 @@ now that the closed states render correctly, we need to give our dropdown the ab
 
 <sub>./src/App.js</sub>
 ```js
+  //...
+
   const [topAlbumOpen, setTopAlbumOpen] = useState(false);
 
   const toggleTopAlbumOpen = ()=> setTopAlbumOpen(open => !open);
@@ -1225,38 +1226,39 @@ first we'll put some basic styles on the `<ul/>` (which is inside `.card`)
 
 <sub>./src/App.scss</sub>
 ```scss
-ul.selectable-albums {
-  list-style: none;
-  padding: 0;
+  //...
+  ul.selectable-albums {
+    list-style: none;
+    padding: 0;
 ```
 
 and position it just below the `.album-dropdown-base`
 
 ```scss
-  position: absolute;
-  top: 100%;
-  width: 100%;
+    position: absolute;
+    top: 100%;
+    width: 100%;
 ```
 
 then we can limit its height and make it scrollable
 
 ```scss
-  max-height: 25vh;
-  overflow-y: auto;
+    max-height: 25vh;
+    overflow-y: auto;
 ```
 
 finally we can add a box-shadow to match the decor and a z-index to render it correctly
 
 ```scss
-  margin: 2px 0 0 0;
+    margin: 2px 0 0 0;
 
-  z-index: 30;
+    z-index: 30;
 
-  background-color: white;
-  box-shadow:
-    0px 1px 3px 0px rgba(0,0,0,0.2),
-    0px 1px 1px 0px rgba(0,0,0,0.14),
-    0px 2px 1px -1px rgba(0,0,0,0.12);
+    background-color: white;
+    box-shadow:
+      0px 1px 3px 0px rgba(0,0,0,0.2),
+      0px 1px 1px 0px rgba(0,0,0,0.14),
+      0px 2px 1px -1px rgba(0,0,0,0.12);
   
 }
 ```
@@ -1303,25 +1305,34 @@ and we can limit the size and set text overflow to `ellipsis` (aka to cut off th
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
+          flex-basis: 33%;
+          text-align: center;
+
 
           &:first-of-type {
             width: 45px;
           }
-          &:nth-last-of-type(2){
-            width: 140px;
+          &:last-of-type {
+            flex-basis: 67%;
+            text-align: left;
           }
         }
 
+  //...
+
+
+}
+
 ```
 
-that looks pretty good for 25 lines of SCSS - Snoop would be impressed by our mix of pithy brevity with meaningful levity
+that looks pretty good for 100 lines of SCSS - Snoop would be impressed by our mix of pithy brevity with meaningful levity
 
 styling the spans in the `.album-dropdown-base` is left as an exercise, the selectors and rules we just learned should show you the way
 
 
 #### the click out
 
-finally, the user instinctually will expect that clicking outside of the drop down will close the dropdown and gobble up the click event (not trigger `onClick` for whatever outside the dropdown they clicked)
+finally, the user instinctually will expect that clicking outside of the drop down will close the dropdown and gobble up the click event (not trigger `onClick` for whatever outside the dropdown they clicked above)
 
 to accomplish this, we'll render a `<div/>` underneath the dropdown `<ul/>` but above everything else
 
@@ -1346,10 +1357,10 @@ then it will take the click event for "click-out" and we can trigger a function 
           )}
 ```
 
-here we're using the empty tag syntax for `React.Fragment` ie `<> ... </>`, which is a fake element which just wraps a bunch of tags so that there's technically one root element returned from an expression (here we need it because of the conditional ternary operator is an expression, which means it can only evaluate to one root element)
+here we're using the empty tag syntax for `React.Fragment` ie `<> ... </>`, which is an abstract element nonce which just wraps a bunch of tags so that there's technically one root element returned from an expression (here we need it because of the conditional ternary operator is an expression, which means it can only evaluate to one root element)
 
 
-we'll need to style the clickout div to capture the clicks when they aren't on the dropdown list items
+we'll need to style the clickout `<div />` to capture the clicks when they aren't on the dropdown list items
 
 <sub>./src/App.scss</sub>
 ```scss
@@ -1411,7 +1422,7 @@ we can use the index-file pattern again to keep our data separate from our view
 ```js
 export default [
   { name: 'Snoop Dogg', imgSrc: 'http://i.imgur.com/8wjnDvw.png' },
-  { name: 'Tupac Shakur', imgSrc: 'https://timpviewnews.org/wp-content/uploads/2019/09/xzz8rezYcE8usc8V33ZAYTNOtWK0vCN5eEIhkCf2.png' },
+  { name: 'Tupac Shakur', imgSrc: 'https://pngimg.com/uploads/2pac/2pac_PNG33.png' },
   { name: 'Dr Dre', imgSrc: 'https://i.imgur.com/QYo0aPI.png' },
   { name: 'Eminem', imgSrc: 'http://4.bp.blogspot.com/_wevkEt-i9rw/R0YBWvL9WuI/AAAAAAAAABs/G6TjBC3BuXY/s320/eminem-5.png' },
 ];
@@ -1440,7 +1451,7 @@ now we get to use the other common value ... `position: fixed` ... which is the 
   left: 0;
   right: 0;
   border-bottom: 2px solid black;
-  background-color: #3338;
+  background-color: #13006688;
   color: white;
 }
 
@@ -1456,7 +1467,7 @@ the reason it'd get hidden under there is that `position: fixed` (like `position
 
 what does that mean?
 
-the DOCUMENT FLOW is the order (top left to bottom right) that elements render in normal HTML. `display: block` or `display: flex` elements go top to bottom, `display: inline` or `display: inline-block` or `display: inline-flex` go from left to right. Normally when you render something like:
+the DOCUMENT FLOW is the order (top left to bottom right) that elements render in normal HTML. `display: block` or `display: flex` elements go top to bottom (flex children can be re-directed with flex-direction), `display: inline` or `display: inline-block` or `display: inline-flex` go from left to right. Normally when you render something like:
 
 ```html
 <div>blah</div>
@@ -1465,12 +1476,12 @@ the DOCUMENT FLOW is the order (top left to bottom right) that elements render i
 
 `div` and `p` are both `display: block` by default, so `blah` renders above `hmm`
 
-if we'd styled the `div` to be `position: fixed` at the top of the window, they would render on top of eachother because the `div` no longer pushes the `p` down the page (because it can only do that if it's IN FLOW)
+if we'd styled the `div` to be `position: fixed` at the top of the window, they would render on top of eachother because the `div` no longer pushes the `p` down the page (because it can only do that if it's IN THE FLOW)
 
-generally, we want to keep elements IN FLOW - we make exceptions in two cases:
+generally, we want to keep elements IN THE FLOW - we make exceptions in two cases:
 
 1. things that really actually need to stay in a fixed position on the screen (such as navbars or static footers)
-2. lowly elements positioned absolutely inside a meaningful container (as we saw with the `swanky-input-container`, which itself is still IN FLOW)
+2. lowly elements positioned absolutely inside a meaningful container (as we saw with the `swanky-input-container`, which itself is still IN THE FLOW)
 
 
 #### rendering the image
@@ -1479,7 +1490,7 @@ we're going to need to import the `rappers` array (along with whatever we were `
 
 <sub>./src/App.js</sub>
 ```js
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './App.scss';
 
 import emailRegex from './emailRegex';
@@ -1559,32 +1570,34 @@ now the funky CSS
 
 <sub>./src/App.scss</sub>
 ```scss
-//...
+//... inside the .header
 
-ul.hover-dropdown {
-  list-style: none;
-  padding: 0;
-  
-  position: absolute;
-  right: 10px;
-  top: 20px;
+  z-index: 50;
 
-  height: 30px;
-  overflow: hidden;
+  ul.hover-dropdown {
+    list-style: none;
+    padding: 0;
+    
+    position: absolute;
+    right: 10px;
+    top: 20px;
 
-  &:hover {
-    height: initial;
-    z-index: 50;
-  }
-
-  li {
     height: 30px;
-    font-size: 24px;
-    padding: 3px 10px;
-  
-    background-color: #000c;
+    overflow: hidden;
+
+    &:hover {
+      height: initial;
+      z-index: 50;
+    }
+
+    li {
+      height: 30px;
+      font-size: 24px;
+      padding: 3px 10px;
+      
+      background-color: #000c;
+    }
   }
-}
 
 //...
 ```
@@ -1665,7 +1678,7 @@ however, the top list item is sometimes rendering on top of our rapper image, so
 //...
 ```
 
-In the real world (tm), we'll probably be using this pattern to make a navigation menu, not some frivolous `<img/>` selector.
+In the real world™, we'll probably be using this pattern to make a navigation menu, not some frivolous `<img/>` selector.
 
 So we'll have to remember it so we can use it in the next workshop!
 
@@ -1765,7 +1778,7 @@ export default [
 
           <div className="card swanky-input-container">
             <div className="country-dropdown-base">
-              <input value={countryQuery} onChange={e=> queryCountries(e.target.value)}/>
+              <input value={countryQuery} onChange={event=> queryCountries(event.target.value)}/>
 
               <span className='title'>Country</span>
 
@@ -1974,7 +1987,7 @@ and, if the user clicks back into the input, we want to show the dropdown
           <div className="country-dropdown-base">
             <input
               value={countryQuery}
-              onChange={e=> queryCountries(e.target.value)}
+              onChange={event=> queryCountries(event.target.value)}
               onFocus={()=> queryCountries(countryQuery)}
             />
 
