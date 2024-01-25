@@ -114,11 +114,11 @@ export default [
   'Kazakhstan',
   'Kenya',
   'Kiribati',
-  'Korea, Democratic People\'s Republic of',
+  'Korea, Democratic People\'S Republic of',
   'Korea, Republic of',
   'Kuwait',
   'Kyrgyzstan',
-  'Lao People\'s Democratic Republic',
+  'Lao People\'S Democratic Republic',
   'Latvia',
   'Lebanon',
   'Lesotho',
@@ -241,5 +241,5 @@ export default [
   'Western Sahara',
   'Yemen',
   'Zambia',
-  'Zimbabwe',
+  'Zimbabwe'
 ];
