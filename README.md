@@ -567,7 +567,7 @@ now we can position the label properly (in the top left of the container)
         
         font-weight: 300;
         font-size: 16px;
-        z-index: 200;
+        z-index: 20;
       }
     }
  
@@ -974,7 +974,6 @@ first let's initialize some varaibles with `useState` for the user to fill in
 //...
 
   const [job, setJob] = useState('');
-  const [country, setCountry] = useState('');
   const [topAlbum, setTopAlbum] = useState(null);
 
 //...
@@ -1279,6 +1278,10 @@ now that we have the `<ul/>` styled, we can style the `<li/>` tags within it
         z-index: 30;
         background-color: white;
 
+
+        &:hover {
+          background: #3333;
+        }
 
         img {
           height: 45px;
@@ -1728,7 +1731,7 @@ to print out the data that we'll want for the file, we can do
 
 
 ```js
-JSON.stringify(output.map(i => i.name)).replace(/",/g, '",\n')
+consle.log( JSON.stringify(output.map(i => i.name)).replace(/",/g, '",\n') )
 ```
 
 then copy pasted the result (without the containing "double quotes") into my file (also I needed to escape a few single quotes)
@@ -1766,7 +1769,6 @@ export default [
 ```js
   //...
 
-  const [country, setCountry] = useState('');
   const [countryQuery, setCountryQuery] = useState('');
   const [selectableCountries, setSelectableCountries] = useState([]);
 
@@ -1813,7 +1815,6 @@ import countries from './countries';
   //...
 
   const selectCountry = (countryName)=>{
-    setCountry(countryName);
     setCountryQuery(countryName);
     setSelectableCountries([]);
   };
@@ -1836,51 +1837,51 @@ for now, typing the the input will always show the first three countries, we'll 
 //...
 
 
-.country-dropdown-base {
-  position: relative;
-  height: 100%;
-}
+      .country-dropdown-base {
+        position: relative;
+        height: 100%;
+      }
 
-.country-dropdown-base input {
-  background-color: #0000;
-}
+      .country-dropdown-base input {
+        background-color: #0000;
+      }      
 
+      ul.selectable-countries {
+        list-style: none;
+        padding: 0;
+      
+        position: absolute;
+        top: 100%;
+        width: 100%;
+      
+        max-height: 25vh;
+        overflow-y: auto;
+        
+        margin: 2px 0 0 0;
+      
+        z-index: 30;
+      
+        background-color: white;
+        box-shadow:
+          0px 1px 3px 0px rgba(0,0,0,0.2),
+          0px 1px 1px 0px rgba(0,0,0,0.14),
+          0px 2px 1px -1px rgba(0,0,0,0.12);
+        
+      
+        li {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          padding: 10px;
+      
+          &:hover {
+            background-color: #eee;
+          }
+        }
+      }
 
-ul.selectable-countries {
-  list-style: none;
-  padding: 0;
-
-  position: absolute;
-  top: 100%;
-  width: 100%;
-
-  max-height: 25vh;
-  overflow-y: auto;
-  
-  margin: 2px 0 0 0;
-
-  z-index: 30;
-
-  background-color: white;
-  box-shadow:
-    0px 1px 3px 0px rgba(0,0,0,0.2),
-    0px 1px 1px 0px rgba(0,0,0,0.14),
-    0px 2px 1px -1px rgba(0,0,0,0.12);
-  
-
-  li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    padding: 10px;
-
-    &:hover {
-      background-color: #eee;
-    }
-  }
-}
-
+//...
 ```
 
 that's pretty straightforward eh?
@@ -1890,10 +1891,6 @@ now we need the autocomplete to do something worthwhile
 
 
 #### filtering and sorting on the fly
-
-if there's an exact match, we should set that into `country`
-
-meanwhile
 
 to generate an autocomplete list
 
@@ -1910,24 +1907,19 @@ then take just the top three
 ```js
   //...
 
+
   const queryCountries = (query)=>{
     setCountryQuery(query);
 
-    const foundCountry = countries.find(
-      countryName => countryName.toLowerCase() === query.toLowerCase()
+    setSelectableCountries(
+      countries
+        .map(countryName => [countryName, score(query, countryName)])
+        .sort((ca, cb)=> cb[1] - ca[1])
+        .map(c=> c[0])
+        .slice(0,3)
     );
-
-    if( foundCountry ) selectCountry(foundCountry);
-    else
-      setSelectableCountries(
-        countries
-          .map(countryName => [countryName, score(query, countryName)])
-          .sort((ca, cb)=> cb[1] - ca[1])
-          .map(c=> c[0])
-          .slice(0,3)
-      );
   };
-
+  
 ```
 
 but there's a bug! `score` is undefined, which is not a function!
@@ -1942,6 +1934,7 @@ first, check if the entire query is included in the option -> if it is add (quer
 for every number N less than the length of the query, take the first N characters of the query
  -> check if those are included in the option -> if they are add (N) to the score
 subtract the length of the option (or 10, whichever is less ... we don't want to punish long names too much)
+add a few bonus points if the first letter matches, because usually that is important
 ```
 
 The score will be maximized if the entire query is found and there are no other characters
@@ -1950,29 +1943,41 @@ let's see that in js
 
 ```js
 const score = (query='', option)=>
-  query.split('').reduce((p, c, i)=>
-    p + (option.toLowerCase().includes( query.slice(0, query.length -i).toLowerCase() ) ?
-         query.length - i : 0
-    ), -Math.min(10, option.length));
+  (
+    query
+      .split('')
+      .reduce((scoreSoFar, c, i)=>
+        scoreSoFar + (
+          option.toLowerCase().includes( query.slice(0, query.length -i).toLowerCase() ) ?
+          query.length - i : 0
+        ), -Math.min(10, option.length) + (query[0]?.toLowerCase() === option[0]?.toLowerCase() ? 3 : 0)
+  ));
 ```
 
 I've accomplished the step of `start at 0` and `subtract the length or 10` by starting at `-length, or -10` (in the `.reduce`'s initial value param)
 
 `query.split('')` will give us an Array of the right length which we can loop over (one for each character)
 
-`.reduce((p, c, i)=>` is a reduce function (p = previous value, c = current item, i = index)
+`.reduce((scoreSoFar, c, i)=>` is a reduce function
 
-here, the current items are the character which we won't really use, so all we care about is p = the running total and i the index we're looking at
+`(scoreSoFar = previous value, c = current char we ignore, i = index we use to slice)`
 
-`p + (...)` we return the previous running total plus whatever value we compute for this index
+here, the current items are the character which we won't really use, so all we care about is scoreSoFar = the running total and i the index we're looking at
+
+`scoreSoFar + (...)` we return the previous running total plus whatever value we compute for this index
 
 `option.toLowerCase().includes( ... ) ? query.length - i : 0` if the option contains (... the part of the query ...) evaluate the length of the part of the query (to be added to the running total), otherwise 0 (don't change the running total)
 
 `query.slice(0, query.length -i).toLowerCase()` take the first N letters of the query (`i` counts up from `0`, so `query.length -i` will count down from the length of the query) to be compared to
 
-`, -Math.min(10, option.length)` start the reduce's running total (`p`'s init value) at `-length` or `-10` whichever is closer to `0`
+`, -Math.min(10, option.length)` start the reduce's running total (`scoreSoFar`'s init value) at `-length` or `-10` whichever is closer to `0`
 
 both strings are forced into lower case in order to ignore case differences between the query and the option
+
+
+`+ (query[0]?.toLowerCase() === option[0]?.toLowerCase() ? 3 : 0)`
+
+this will add 3 bonus points when the first letter is a match
 
 
 #### click out, re-query
@@ -1983,33 +1988,28 @@ and, if the user clicks back into the input, we want to show the dropdown
 
 
 ```html
-        <div className="card swanky-input-container">
-          <div className="country-dropdown-base">
-            <input
-              value={countryQuery}
-              onChange={event=> queryCountries(event.target.value)}
-              onFocus={()=> queryCountries(countryQuery)}
-            />
+        <div className='card swanky-input-container'>
+          <div className='country-dropdown-base'>
+            <input value={countryQuery} onChange={event=> queryCountries(event.target.value)}/>
 
             <span className='title'>Country</span>
 
             {selectableCountries.length ? (
-               <>
-                 <ul className='selectable-countries'>
-                   {selectableCountries.map(countryName=> (
-                     <li key={countryName} onClick={()=> selectCountry(countryName)}>
-                       {countryName}
-                     </li>
-                   ))}
-                 </ul>
-                 <div className='click-out' onClick={()=> setSelectableCountries([])}/>
-               </>
+              <>
+                <ul className='selectable-countries'>
+                  {selectableCountries.map(countryName=> (
+                    <li key={countryName} onClick={()=> selectCountry(countryName)}>
+                      {countryName}
+                    </li>
+                  ))}
+                </ul>
+                <div className='click-out' onClick={()=> setSelectableCountries([])}/>
+              </>
             ): null}
           </div>
         </div>
 ```
 
-we can reuse `this.clickOut` from before, we'll need to reset a few more `state` values therein now
 
 <sub>./src/App.scss</sub>
 ```scss
@@ -2029,9 +2029,20 @@ ul.selectable-countries {
 
 ```
 
+when the user clicks back in, we'll want to show the dropdown list again
 
-(( author NB, updated til here ))
+pretty easy - we can do this with the `onFocus` callback on our countries `<input />`
 
+```html
+
+            <input
+              value={countryQuery}
+              onChange={event=> queryCountries(event.target.value)}
+              onFocus={()=> queryCountries(countryQuery)}
+            />
+
+
+```
 
 
 
@@ -2041,146 +2052,168 @@ Snoop wants to know when you can start working!
 
 To make our life easy, we're not going to build a datepicker from scratch - that'd be reinventing the wheel!
 
-Instead, we're going to use [Hacker0x01's popular react-datepicker module](https://github.com/Hacker0x01/react-datepicker)
-
-`$ npm install -S react-datepicker`
-
-or
-
-`$ yarn add react-datepicker`
-
-the react-datepicker docs should give you all you need to pick a date and put it in the state!
+Instead, we're going to use [clouscape's datepicker](https://cloudscape.design/components/date-picker/)
 
 
-the team that wrote react-datepicker made their `<DatePicker/>` Component using the same controlled input pattern, which should make it very easy to use
+[Let's get started with the getting started](https://cloudscape.design/get-started/integration/using-cloudscape-components/)
 
-just remember to put it in a `<div className='card'>...</div>`
+`npm i -S @cloudscape-design/global-styles @cloudscape-design/components`
 
 
-<details>
-<summary>Click here to view solution for this section</summary>
-
-```html
-
-          <div className='card date-input-container swanky-input-container'>
-            <DatePicker selected={this.state.startDate} onChange={this.setStartDate}/>
-            <span className='title'>Start Date</span>
-          </div>
-```
+this is what the docs are telling us about how to use a `<DatePicker />` from the cloudscape library
 
 ```js
-  setStartDate = startDate => this.setState({ startDate })
+import '@cloudscape-design/global-styles/index.css';
+
+import DatePicker from '@cloudscape-design/components/date-picker';
+
+//...
+
+
+      <DatePicker
+        onChange={({ detail }) => setValue(detail.value)}
+        value={value}
+        openCalendarAriaLabel={selectedDate =>
+          "Choose certificate expiry date" +
+          (selectedDate
+            ? `, selected date is ${selectedDate}`
+            : "")
+        }
+        placeholder="YYYY/MM/DD"
+      />
 ```
 
-</details>
+the imports make sense, so let's break down the component JSX
+
+`<DatePicker   ... />` --> we're rendering a self closing tag
+
+`  onChange={ ... }` it takes an `onChange` prop
+
+`({ detail }) =>` we destructure the change event argument `.detail` (what this means is a bit of a mystery still)
+
+`setValue(detail.value)` we call a setter for a poorly named variable with `detail.value`, which begs the question what `.detail` is and why it needs to exist
 
 
-#### shimming the CSS
+let's try it out, see how it goes
 
-now that we got our `<DatePicker/>` working, we need to fix a few CSS bugs
+```js
+import '@cloudscape-design/global-styles/index.css';
+import DatePicker from '@cloudscape-design/components/date-picker';
 
-1. the popper renders underneath some other form components
-2. the `<input/>` doesn't take up the right space in the `.card`
-3. our `span.title` isn't highlighting correctly on `:focus`
+  //...
 
-how are we going to figure out how to fix CSS in someone else's code?
+  
+  const [startDate, setStartDate] = useState();
 
-Snoop famously says "gangsters use the dev tools"... so let's inspect the elements (right click them) in the dev tools and figure out why the bugs are happening
+  //...
 
-1. the popper has a z-index problem
+        <div className='card swanky-input-container'>
+          <DatePicker
+            onChange={(event) => setStartDate(event.detail.value)}
+            value={startDate}
+            placeholder="YYYY/MM/DD"
+          />
+        </div>
+```
 
-when we click the little `<input/>` to get the date-picker-popper, we can see in the HTML elements panel (by selecting the correct div and inspecting its CSS rules) that some part of the datepicker.css is giving it `z-index: 1`
+let's log the entire change object and see what's in it to figure this out
 
-now we can test if changing that would work (we can edit the CSS live in the browser)
 
-so if we can just get `z-index: 40` onto that `<div/>`, everything will be fine
+<sub> in the console </sub>
+```js
 
-<sub>./src/App.css</sub>
-```css
-.react-datepicker-popper {
-  z-index: 40;
+{
+    "cancelable": false,
+    "detail": {
+        "value": "2024-01-04"
+    },
+    "defaultPrevented": false,
+    "cancelBubble": false
 }
+
 ```
 
-... hmm, that didn't work... why?
+so it's a synthetic event (not a native browser event) and `detail` is just some container that means nothing where the `value` lives... ok
 
-if we go to inspect the element again, we see that our `z-index: 40` rule is lower on the list than the `z-index: 1` rule and is being overridden!
+so now let's talk about the CSS being broken
 
-the reason for this is the C in CSS (cascading, as in: rules that are written later override previous rules)
-
-as it turns out, the compiler is putting our CSS before the lib CSS, so their's overrides ours!
-
-how can we override their's?
-
-good question: the answer is [CSS specificity](https://www.google.com/search?q=css+specificity)
-
-all we have to do is make a MORE SPECIFIC rule, and CSS will apply ours over their's!
-
-```css
-.card .react-datepicker-popper {
-  z-index: 40;
-}
-```
-
-it turns out, 2 classNames is more specific than 1 (who would've guessed that)
+probably in the cloudscape framework, we're expected to put this `DatePicker` inside some div soup container component. I don't really feel like doing that, I'd rather just shim the CSS to work on its own
 
 so la di da di, we likes to party, we override your CSS, we don't bother nobody.
 
+```scss
 
+//... inside .swanky-input-container
 
-2. the `<input/>` sizing
+      &.centering {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-when we sized our `<input/>`s before, we relied on the `.card` being the relative reference frame element.
+      [class*='awsui_input-container'] {
+        min-height: 34px;
+      }
 
-however, when we inspect the current state of affairs, we see that the `react-datepicker` library is putting its own `relative` div inbetween ours and the `<input/>`
+      [class*='awsui_date-picker-container'] {
+        flex-basis: 100%;
+        margin-top: 20px;
+      }
 
-hmm...
-
-there's not much of a clean solution to this.
-
-In general, I'd rather keep to the relative sizing styles we've been using so far
-
-that said, in this one instance we can hard code some pixel sizes on the input
-
-```css
-.date-input-container input {
-  height: 60px;
-  width: 286px;
-  top: 0;
-}
 ```
 
-not elegant, but it'll do.
+is all that it takes (aside from twenty minutes futzing in the browser dev panel
+
+Snoop says: Real Gangstas use the dev tools
+
+As soon as I started using the dev panel features to their maximum, my CSS skillz EXPLODED.
+
+here, I inspected element on the div soup created by cloudscape, and found a div which had `height` of 0
+
+that div had a uniquified class applied to it that starts with `awsui_input-container`
+
+so we can select it by matching part of the class attribute in an attribute selector `[class*=whatever]`
+
+similarly with the `awsui_date-picker-container`, we can make sure it styles correctly now that we're making it a flex child
 
 
-3. the title isn't highlighting
+---
 
-this is due to our rule being `input:focus + span.title`
+anyhow, on the swanky-input-container `<div />` we need to add the `.centering` className
 
-which relied on the `<input/>` and `<span/>` being adjacent siblings
+and we can add a label
 
-now when we inspect the datepicker, we see that the `<input/>` is nested inside some `<div/>`s, and is therefore no longer an adjacent sibling
+```html
+//...
 
-so we'll need a new solution... we can use `:focus-within` pseudoselector, which is a bit less specific, but works nicely
+        <div className='card swanky-input-container centering'>
 
-```css
-.date-input-container:focus-within span.title {
-  color: green;
-  font-size: 12px;
-}
+          <span className='title'>Start Date</span>
+
+//... the DatePicker
+
+        </div>
+
+//...
+
 ```
 
-Snoop says: Gangsters use the dev tools
 
-sometimes when we deal with third party CSS, we'll end up with bugs caused by unforseen code interactions
+so that looks pretty good, and it leverages all the conveniences of the exiting library's `DatePicker`
 
-in those instances (also when we cause the bugs ourselves) the inspect elements panel is extremely powerful
 
-it tells us what HTML elements we have and how they're structured, AND all the CSS that applies to them and in which order
+---
 
-AND it let's us edit the CSS live to try out solutions we think of.
+that's it for form elements and fundamental CSS
 
-As soon as I started using these features to their maximum, my CSS skillz EXPLODED.
+if you've coded along this far, you've spent the time learning most of the skills you need to write user input form elements for the vast majority of end-user use cases.
+
+if you just copy pasted along, you've seen the process of how front end products are developed
+
+in the next section, we'll deploy out website to the cloud and build a backend for our client to read the form submissions
+
+this will require access to an AWS account.
+
 
 ---
 
@@ -2188,29 +2221,14 @@ As soon as I started using these features to their maximum, my CSS skillz EXPLOD
 
 ---
 
-the rest of this workshop is targeting the senior dev track.
-
 <a name="step4"></a>
-## step 4: and it's gotta be bumpin - refactor to components
+## step 4: sending the form input to the API, admin page
 
-### rapper images, menu dropdown
-### floating label input
-### image dropdown
-### autocomplete dropdown
-### SCSS
-### destructuring this.state in render
+### collecting the data into a JSON
+### making a fetch request
+### inspecting network calls in the dev panel
+### deploying a website to S3 behind API Gateway
+### writing a lambda for the website to call
+### writing a lambda for the admin page to call
+### writing an admin page to read the sign-ups
 
-
-<a name="step5"></a>
-## city of compton - notifications and animations
-
-### toastr on submit
-### transition on cards entry
-### transition on floating labels
-### transition on validation colors
-### transition on dropdowns
-### tupac ak-47!!!!
-
-
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
